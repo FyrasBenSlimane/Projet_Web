@@ -9,7 +9,8 @@ $components = [
     'navbar' => $componentsPath . '/navbar.php',
     'hero' => $componentsPath . '/hero.php',
     'content-sections' => $componentsPath . '/content-sections.php',
-    'footer' => $componentsPath . '/footer.php',
+    'job-offers' => $componentsPath . '/job-offers.php',
+    'footer' => $componentsPath . '/footer.php'
 ];
 
 // Pre-load component check to avoid render-blocking errors
@@ -357,6 +358,13 @@ $initialTheme = $savedTheme ?: ($systemTheme ?: 'light');
         <?php include $components['content-sections']; ?>
     <?php else: ?>
         <div class="alert alert-danger m-3">Error loading content sections component: File not found at <?= $missingComponents['content-sections'] ?></div>
+    <?php endif; ?>
+
+    <!-- Job Offers Component -->
+    <?php if (file_exists($components['job-offers'])): ?>
+        <?php include $components['job-offers']; ?>
+    <?php else: ?>
+        <div class="alert alert-danger m-3">Error loading job offers component: File not found at <?= $components['job-offers'] ?></div>
     <?php endif; ?>
     
     <!-- Footer Component -->

@@ -366,6 +366,9 @@
                     <a class="nav-link" href="#featured-services">Services</a>
                 </li>
                 <li class="nav-item">
+                    <a class="nav-link" href="/web/components/home/offers/offers.php">Job Offers</a>
+                </li>
+                <li class="nav-item">
                     <a class="nav-link" href="#how-it-works">How It Works</a>
                 </li>
                 <li class="nav-item">

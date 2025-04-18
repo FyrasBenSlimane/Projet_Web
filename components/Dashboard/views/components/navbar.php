@@ -43,7 +43,7 @@ if ($profileData && !empty($profileData['profile_image'])) {
                         $pageTitle = 'Projects';
                         break;
                     case 'services':
-                        $pageTitle = 'My Services';
+                        $pageTitle = 'Job Offers';
                         break;
                     case 'messages':
                         $pageTitle = 'Messages';

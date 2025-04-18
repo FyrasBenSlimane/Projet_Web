@@ -753,7 +753,7 @@
                     <li class="sidebar-menu-item">
                         <a href="#" class="sidebar-menu-link">
                             <i class="bi bi-person-workspace sidebar-menu-icon"></i>
-                            My Services
+                            Job Offers
                         </a>
                     </li>
                     <li class="sidebar-menu-item">
@@ -839,6 +839,9 @@
                                 break;
                             case 'settings':
                                 echo 'Settings';
+                                break;
+                            case 'services':
+                                echo 'Job Offers';
                                 break;
                             default:
                                 echo 'Dashboard';
