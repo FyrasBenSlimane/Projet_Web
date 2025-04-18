@@ -1,41 +1,135 @@
 <?php
-require_once __DIR__ . '/../../../components/Dashboard/controllers/JobOffersController.php';
-
-// Initialize controller
-$jobOffersController = new JobOffersController();
+require_once __DIR__ . '/../../../config/database.php';
 
 // Initialize message variable
 $message = '';
+$error = '';
+
+function validateJobOffer($data) {
+    $errors = [];
+    
+    // Title validation
+    if (empty($data['title'])) {
+        $errors['title'] = "Title is required";
+    } elseif (strlen($data['title']) < 3 || strlen($data['title']) > 100) {
+        $errors['title'] = "Title must be between 3 and 100 characters";
+    }
+    
+    // Description validation
+    if (empty($data['description'])) {
+        $errors['description'] = "Description is required";
+    } elseif (strlen($data['description']) < 10) {
+        $errors['description'] = "Description must be at least 10 characters";
+    }
+    
+    // Category validation
+    if (empty($data['category'])) {
+        $errors['category'] = "Category is required";
+    }
+    
+    // Salary validation
+    if (empty($data['salary_min']) || empty($data['salary_max'])) {
+        $errors['salary'] = "Both minimum and maximum salary are required";
+    } elseif ($data['salary_min'] > $data['salary_max']) {
+        $errors['salary'] = "Minimum salary cannot be greater than maximum salary";
+    } elseif ($data['salary_min'] < 0 || $data['salary_max'] < 0) {
+        $errors['salary'] = "Salary cannot be negative";
+    }
+    
+    // Location validation
+    if (empty($data['location'])) {
+        $errors['location'] = "Location is required";
+    }
+    
+    // Image URL validation
+    if (empty($data['image_url'])) {
+        $errors['image_url'] = "Image URL is required";
+    } elseif (!filter_var($data['image_url'], FILTER_VALIDATE_URL)) {
+        $errors['image_url'] = "Please enter a valid URL";
+    }
+    
+    return $errors;
+}
 
 // Handle form submissions
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['action'])) {
         switch ($_POST['action']) {
             case 'create':
-                if ($jobOffersController->createJob($_POST)) {
-                    $message = "Job offer created successfully!";
-                }
-                break;
-
             case 'update':
-                if ($jobOffersController->updateJob($_POST)) {
-                    $message = "Job offer updated successfully!";
+                $validation_errors = validateJobOffer($_POST);
+                
+                if (empty($validation_errors)) {
+                    $title = $_POST['title'];
+                    $description = $_POST['description'];
+                    $category = $_POST['category'];
+                    $salary_min = $_POST['salary_min'];
+                    $salary_max = $_POST['salary_max'];
+                    $location = $_POST['location'];
+                    $image_url = $_POST['image_url'];
+                    
+                    // Generate slug from title
+                    $slug = strtolower(trim(preg_replace('/[^A-Za-z0-9-]+/', '-', $title)));
+                    
+                    if ($_POST['action'] === 'create') {
+                        $sql = "INSERT INTO job_offers (title, description, category_id, salary_min, salary_max, location_id, image_url, slug) 
+                                VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+                        $stmt = $pdo->prepare($sql);
+                        if ($stmt->execute([$title, $description, $category, $salary_min, $salary_max, $location, $image_url, $slug])) {
+                            $message = "Job offer created successfully!";
+                        } else {
+                            $error = "Error creating job offer";
+                        }
+                    } else {
+                        $id = $_POST['job_id'];
+                        $sql = "UPDATE job_offers SET title=?, description=?, category_id=?, salary_min=?, salary_max=?, location_id=?, image_url=?, slug=? WHERE job_id=?";
+                        $stmt = $pdo->prepare($sql);
+                        if ($stmt->execute([$title, $description, $category, $salary_min, $salary_max, $location, $image_url, $slug, $id])) {
+                            $message = "Job offer updated successfully!";
+                        } else {
+                            $error = "Error updating job offer";
+                        }
+                    }
+                } else {
+                    $error = implode("<br>", $validation_errors);
                 }
                 break;
 
             case 'delete':
-                if ($jobOffersController->deleteJob($_POST['job_id'])) {
-                    $message = "Job offer deleted successfully!";
+                $id = $_POST['job_id'];
+                if (!empty($id)) {
+                    $sql = "DELETE FROM job_offers WHERE job_id = ?";
+                    $stmt = $pdo->prepare($sql);
+                    if ($stmt->execute([$id])) {
+                        $message = "Job offer deleted successfully!";
+                    } else {
+                        $error = "Error deleting job offer";
+                    }
                 }
                 break;
         }
     }
 }
 
-// Fetch data using controller
-$jobs = $jobOffersController->getAllJobs();
-$categories = $jobOffersController->getCategories();
-$locations = $jobOffersController->getLocations();
+// Fetch all job offers
+$sql = "SELECT jo.*, jc.name as category_name, l.city, l.country, l.is_remote,
+        (SELECT COUNT(*) FROM job_applications WHERE job_id = jo.job_id) as applicant_count
+        FROM job_offers jo
+        LEFT JOIN job_categories jc ON jo.category_id = jc.category_id
+        LEFT JOIN locations l ON jo.location_id = l.location_id
+        ORDER BY jo.created_at DESC";
+$stmt = $pdo->query($sql);
+$jobs = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+// Fetch categories for dropdown
+$sql = "SELECT * FROM job_categories";
+$stmt = $pdo->query($sql);
+$categories = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+// Fetch locations for dropdown
+$sql = "SELECT * FROM locations";
+$stmt = $pdo->query($sql);
+$locations = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
 <!DOCTYPE html>
@@ -199,6 +293,13 @@ $locations = $jobOffersController->getLocations();
             </div>
         <?php endif; ?>
 
+        <?php if ($error): ?>
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <?php echo htmlspecialchars($error); ?>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        <?php endif; ?>
+
         <div class="row">
             <?php foreach ($jobs as $job): ?>
                 <div class="col-12 col-md-6 col-lg-4">
@@ -226,6 +327,12 @@ $locations = $jobOffersController->getLocations();
                             </div>
                         </div>
                         <div class="job-actions">
+                            <button class="btn btn-sm btn-outline-info show-job" 
+                                    data-bs-toggle="modal" 
+                                    data-bs-target="#showJobModal"
+                                    data-job='<?php echo json_encode($job); ?>'>
+                                <i class="bi bi-eye"></i> Show
+                            </button>
                             <button class="btn btn-sm btn-outline-primary edit-job" 
                                     data-bs-toggle="modal" 
                                     data-bs-target="#editJobModal"
@@ -246,6 +353,52 @@ $locations = $jobOffersController->getLocations();
         </div>
     </div>
 
+    <!-- Show Job Modal -->
+    <div class="modal fade" id="showJobModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Job Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-4">
+                        <h3 id="show_title" class="mb-3"></h3>
+                        <span id="show_category" class="badge bg-primary mb-3 d-inline-block"></span>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <h5 class="text-muted mb-3">Description</h5>
+                        <p id="show_description" class="mb-4"></p>
+                    </div>
+
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h5 class="text-muted mb-3">Salary Range</h5>
+                            <p id="show_salary" class="mb-0"></p>
+                        </div>
+                        <div class="col-md-6">
+                            <h5 class="text-muted mb-3">Location</h5>
+                            <p id="show_location" class="mb-0"></p>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <h5 class="text-muted mb-3">Statistics</h5>
+                        <p id="show_applicants" class="mb-0"></p>
+                    </div>
+
+                    <div class="text-center mt-4">
+                        <img id="show_image" class="img-fluid rounded" style="max-height: 300px;" alt="Job image">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Add Job Modal -->
     <div class="modal fade" id="addJobModal" tabindex="-1">
         <div class="modal-dialog modal-lg">
@@ -259,11 +412,11 @@ $locations = $jobOffersController->getLocations();
                         <input type="hidden" name="action" value="create">
                         <div class="mb-3">
                             <label for="title" class="form-label">Job Title</label>
-                            <input type="text" class="form-control" id="title" name="title" required>
+                            <input type="text" class="form-control" id="title" name="title">
                         </div>
                         <div class="mb-3">
                             <label for="category" class="form-label">Category</label>
-                            <select class="form-control" id="category" name="category" required>
+                            <select class="form-control" id="category" name="category">
                                 <?php foreach ($categories as $category): ?>
                                     <option value="<?php echo $category['category_id']; ?>">
                                         <?php echo htmlspecialchars($category['name']); ?>
@@ -273,25 +426,25 @@ $locations = $jobOffersController->getLocations();
                         </div>
                         <div class="mb-3">
                             <label for="description" class="form-label">Description</label>
-                            <textarea class="form-control" id="description" name="description" rows="3" required></textarea>
+                            <textarea class="form-control" id="description" name="description" rows="3"></textarea>
                         </div>
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label for="salary_min" class="form-label">Minimum Salary</label>
-                                    <input type="number" class="form-control" id="salary_min" name="salary_min" required>
+                                    <input type="number" class="form-control" id="salary_min" name="salary_min">
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label for="salary_max" class="form-label">Maximum Salary</label>
-                                    <input type="number" class="form-control" id="salary_max" name="salary_max" required>
+                                    <input type="number" class="form-control" id="salary_max" name="salary_max">
                                 </div>
                             </div>
                         </div>
                         <div class="mb-3">
                             <label for="location" class="form-label">Location</label>
-                            <select class="form-control" id="location" name="location" required>
+                            <select class="form-control" id="location" name="location">
                                 <?php foreach ($locations as $location): ?>
                                     <option value="<?php echo $location['location_id']; ?>">
                                         <?php echo $location['is_remote'] ? 'Remote' : htmlspecialchars($location['city'] . ', ' . $location['country']); ?>
@@ -301,7 +454,7 @@ $locations = $jobOffersController->getLocations();
                         </div>
                         <div class="mb-3">
                             <label for="image_url" class="form-label">Image URL</label>
-                            <input type="url" class="form-control" id="image_url" name="image_url" required>
+                            <input type="url" class="form-control" id="image_url" name="image_url">
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -327,11 +480,11 @@ $locations = $jobOffersController->getLocations();
                         <input type="hidden" name="job_id" id="edit_job_id">
                         <div class="mb-3">
                             <label for="edit_title" class="form-label">Job Title</label>
-                            <input type="text" class="form-control" id="edit_title" name="title" required>
+                            <input type="text" class="form-control" id="edit_title" name="title">
                         </div>
                         <div class="mb-3">
                             <label for="edit_category" class="form-label">Category</label>
-                            <select class="form-control" id="edit_category" name="category" required>
+                            <select class="form-control" id="edit_category" name="category">
                                 <?php foreach ($categories as $category): ?>
                                     <option value="<?php echo $category['category_id']; ?>">
                                         <?php echo htmlspecialchars($category['name']); ?>
@@ -341,25 +494,25 @@ $locations = $jobOffersController->getLocations();
                         </div>
                         <div class="mb-3">
                             <label for="edit_description" class="form-label">Description</label>
-                            <textarea class="form-control" id="edit_description" name="description" rows="3" required></textarea>
+                            <textarea class="form-control" id="edit_description" name="description" rows="3"></textarea>
                         </div>
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label for="edit_salary_min" class="form-label">Minimum Salary</label>
-                                    <input type="number" class="form-control" id="edit_salary_min" name="salary_min" required>
+                                    <input type="number" class="form-control" id="edit_salary_min" name="salary_min">
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label for="edit_salary_max" class="form-label">Maximum Salary</label>
-                                    <input type="number" class="form-control" id="edit_salary_max" name="salary_max" required>
+                                    <input type="number" class="form-control" id="edit_salary_max" name="salary_max">
                                 </div>
                             </div>
                         </div>
                         <div class="mb-3">
                             <label for="edit_location" class="form-label">Location</label>
-                            <select class="form-control" id="edit_location" name="location" required>
+                            <select class="form-control" id="edit_location" name="location">
                                 <?php foreach ($locations as $location): ?>
                                     <option value="<?php echo $location['location_id']; ?>">
                                         <?php echo $location['is_remote'] ? 'Remote' : htmlspecialchars($location['city'] . ', ' . $location['country']); ?>
@@ -369,7 +522,7 @@ $locations = $jobOffersController->getLocations();
                         </div>
                         <div class="mb-3">
                             <label for="edit_image_url" class="form-label">Image URL</label>
-                            <input type="url" class="form-control" id="edit_image_url" name="image_url" required>
+                            <input type="url" class="form-control" id="edit_image_url" name="image_url">
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -386,6 +539,91 @@ $locations = $jobOffersController->getLocations();
     
     <script>
     document.addEventListener('DOMContentLoaded', function() {
+        // Form validation
+        function validateForm(form) {
+            const formData = new FormData(form);
+            const errors = [];
+            
+            // Title validation
+            const title = formData.get('title');
+            if (!title) {
+                errors.push('Title is required');
+            } else if (title.length < 3 || title.length > 100) {
+                errors.push('Title must be between 3 and 100 characters');
+            }
+            
+            // Description validation
+            const description = formData.get('description');
+            if (!description) {
+                errors.push('Description is required');
+            } else if (description.length < 10) {
+                errors.push('Description must be at least 10 characters');
+            }
+            
+            // Category validation
+            if (!formData.get('category')) {
+                errors.push('Category is required');
+            }
+            
+            // Salary validation
+            const salaryMin = parseInt(formData.get('salary_min'));
+            const salaryMax = parseInt(formData.get('salary_max'));
+            
+            if (!salaryMin || !salaryMax) {
+                errors.push('Both minimum and maximum salary are required');
+            } else if (salaryMin > salaryMax) {
+                errors.push('Minimum salary cannot be greater than maximum salary');
+            } else if (salaryMin < 0 || salaryMax < 0) {
+                errors.push('Salary cannot be negative');
+            }
+            
+            // Location validation
+            if (!formData.get('location')) {
+                errors.push('Location is required');
+            }
+            
+            // Image URL validation
+            const imageUrl = formData.get('image_url');
+            if (!imageUrl) {
+                errors.push('Image URL is required');
+            } else {
+                try {
+                    new URL(imageUrl);
+                } catch {
+                    errors.push('Please enter a valid URL');
+                }
+            }
+            
+            return errors;
+        }
+
+        // Handle form submissions
+        const forms = document.querySelectorAll('form');
+        forms.forEach(form => {
+            form.addEventListener('submit', function(e) {
+                if (form.querySelector('input[name="action"]').value !== 'delete') {
+                    const errors = validateForm(this);
+                    if (errors.length > 0) {
+                        e.preventDefault();
+                        const errorMessage = errors.join('<br>');
+                        const alertDiv = document.createElement('div');
+                        alertDiv.className = 'alert alert-danger alert-dismissible fade show';
+                        alertDiv.innerHTML = `
+                            ${errorMessage}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        `;
+                        this.insertBefore(alertDiv, this.firstChild);
+                        
+                        // Auto-hide the error after 5 seconds
+                        setTimeout(() => {
+                            const bsAlert = new bootstrap.Alert(alertDiv);
+                            bsAlert.close();
+                        }, 5000);
+                    }
+                }
+            });
+        });
+
         // Edit job functionality
         document.querySelectorAll('.edit-job').forEach(button => {
             button.addEventListener('click', function() {
@@ -398,6 +636,81 @@ $locations = $jobOffersController->getLocations();
                 document.getElementById('edit_salary_max').value = job.salary_max;
                 document.getElementById('edit_location').value = job.location_id;
                 document.getElementById('edit_image_url').value = job.image_url;
+            });
+        });
+
+        // Show job functionality
+        document.querySelectorAll('.show-job').forEach(button => {
+            button.addEventListener('click', function() {
+                const job = JSON.parse(this.dataset.job);
+                document.getElementById('show_title').textContent = job.title;
+                document.getElementById('show_category').textContent = job.category_name;
+                document.getElementById('show_description').textContent = job.description;
+                document.getElementById('show_salary').textContent = `$${Number(job.salary_min).toLocaleString()} - $${Number(job.salary_max).toLocaleString()}`;
+                document.getElementById('show_location').textContent = job.is_remote ? 'Remote' : `${job.city}, ${job.country}`;
+                document.getElementById('show_applicants').textContent = `${job.applicant_count} applicants`;
+                document.getElementById('show_image').src = job.image_url;
+            });
+        });
+
+        // Real-time validation feedback
+        const inputs = document.querySelectorAll('input, textarea, select');
+        inputs.forEach(input => {
+            input.addEventListener('input', function() {
+                const formData = new FormData();
+                formData.append(this.name, this.value);
+                
+                let error = '';
+                switch(this.name) {
+                    case 'title':
+                        if (this.value.length > 0 && (this.value.length < 3 || this.value.length > 100)) {
+                            error = 'Title must be between 3 and 100 characters';
+                        }
+                        break;
+                    case 'description':
+                        if (this.value.length > 0 && this.value.length < 10) {
+                            error = 'Description must be at least 10 characters';
+                        }
+                        break;
+                    case 'salary_min':
+                    case 'salary_max':
+                        const salaryMin = parseInt(document.querySelector('[name="salary_min"]').value) || 0;
+                        const salaryMax = parseInt(document.querySelector('[name="salary_max"]').value) || 0;
+                        if (salaryMin > salaryMax && salaryMax !== 0) {
+                            error = 'Minimum salary cannot be greater than maximum salary';
+                        } else if (salaryMin < 0 || salaryMax < 0) {
+                            error = 'Salary cannot be negative';
+                        }
+                        break;
+                    case 'image_url':
+                        if (this.value) {
+                            try {
+                                new URL(this.value);
+                            } catch {
+                                error = 'Please enter a valid URL';
+                            }
+                        }
+                        break;
+                }
+                
+                // Show or clear error feedback
+                const feedback = this.nextElementSibling;
+                if (error) {
+                    if (!feedback || !feedback.classList.contains('invalid-feedback')) {
+                        const errorDiv = document.createElement('div');
+                        errorDiv.className = 'invalid-feedback';
+                        errorDiv.textContent = error;
+                        this.parentNode.appendChild(errorDiv);
+                        this.classList.add('is-invalid');
+                    } else {
+                        feedback.textContent = error;
+                    }
+                } else {
+                    if (feedback && feedback.classList.contains('invalid-feedback')) {
+                        feedback.remove();
+                    }
+                    this.classList.remove('is-invalid');
+                }
             });
         });
 

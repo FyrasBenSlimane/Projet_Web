@@ -4,13 +4,13 @@ error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
 // Define the components with absolute paths
-$componentsPath = __DIR__ . '/components/Home';
+$componentsPath = __DIR__ . '/components';
 $components = [
-    'navbar' => $componentsPath . '/navbar.php',
-    'hero' => $componentsPath . '/hero.php',
-    'content-sections' => $componentsPath . '/content-sections.php',
+    'navbar' => $componentsPath . '/home/navbar.php',
+    'hero' => $componentsPath . '/home/hero.php',
+    'content-sections' => $componentsPath . '/home/content-sections.php',
     'job-offers' => $componentsPath . '/job-offers.php',
-    'footer' => $componentsPath . '/footer.php'
+    'footer' => $componentsPath . '/home/footer.php'
 ];
 
 // Pre-load component check to avoid render-blocking errors
