@@ -1,0 +1,267 @@
+<?php
+// Users/Freelancers data
+$users = [
+    [
+        'id' => 1,
+        'name' => 'Alex Mitchell',
+        'email' => 'alex.mitchell@example.com',
+        'avatar' => 'https://randomuser.me/api/portraits/men/32.jpg',
+        'level' => 'Level 2 Seller',
+        'country' => 'United States',
+        'memberSince' => 'Jan 2022',
+        'languages' => ['English', 'Spanish'],
+        'completedProjects' => 156,
+        'rating' => 4.9,
+        'ratingCount' => 203,
+        'description' => 'Full-stack web developer with over 5 years of experience specializing in creating modern, responsive websites.',
+        'skills' => ['HTML5', 'CSS3', 'JavaScript', 'React', 'Node.js', 'PHP']
+    ],
+    [
+        'id' => 2,
+        'name' => 'Emma Davis',
+        'email' => 'emma.davis@example.com',
+        'avatar' => 'https://randomuser.me/api/portraits/women/28.jpg',
+        'level' => 'Top Rated Plus',
+        'country' => 'United Kingdom',
+        'memberSince' => 'Mar 2021',
+        'languages' => ['English', 'French'],
+        'completedProjects' => 243,
+        'rating' => 4.9,
+        'ratingCount' => 256,
+        'description' => 'UI/UX designer passionate about creating beautiful and functional user experiences.',
+        'skills' => ['UI Design', 'UX Design', 'Figma', 'Adobe XD', 'Sketch']
+    ],
+    [
+        'id' => 3,
+        'name' => 'Michael Wong',
+        'email' => 'michael.wong@example.com',
+        'avatar' => 'https://randomuser.me/api/portraits/men/45.jpg',
+        'level' => 'Level 1 Seller',
+        'country' => 'Singapore',
+        'memberSince' => 'Aug 2022',
+        'languages' => ['English', 'Chinese', 'Malay'],
+        'completedProjects' => 78,
+        'rating' => 4.7,
+        'ratingCount' => 92,
+        'description' => 'Video editor and motion graphics designer with a passion for storytelling through visual media.',
+        'skills' => ['After Effects', 'Premiere Pro', 'Motion Graphics', 'Video Editing', '3D Animation']
+    ],
+    [
+        'id' => 4,
+        'name' => 'Sophia Rodriguez',
+        'email' => 'sophia.r@example.com',
+        'avatar' => 'https://randomuser.me/api/portraits/women/42.jpg',
+        'level' => 'Top Rated',
+        'country' => 'Spain',
+        'memberSince' => 'May 2021',
+        'languages' => ['English', 'Spanish', 'Portuguese'],
+        'completedProjects' => 187,
+        'rating' => 4.8,
+        'ratingCount' => 163,
+        'description' => 'Content writer and SEO specialist helping businesses rank higher and convert better with quality content.',
+        'skills' => ['SEO', 'Content Writing', 'Copywriting', 'Blog Writing', 'Technical Writing']
+    ],
+    [
+        'id' => 5,
+        'name' => 'David Kim',
+        'email' => 'david.kim@example.com',
+        'avatar' => 'https://randomuser.me/api/portraits/men/67.jpg',
+        'level' => 'Level 2 Seller',
+        'country' => 'South Korea',
+        'memberSince' => 'Feb 2022',
+        'languages' => ['English', 'Korean'],
+        'completedProjects' => 112,
+        'rating' => 4.9,
+        'ratingCount' => 128,
+        'description' => 'Music producer and composer specializing in creating original soundtracks for games and videos.',
+        'skills' => ['Music Production', 'Sound Design', 'Composition', 'Mixing', 'Mastering']
+    ],
+    [
+        'id' => 6,
+        'name' => 'Olivia Johnson',
+        'email' => 'olivia.j@example.com',
+        'avatar' => 'https://randomuser.me/api/portraits/women/63.jpg',
+        'level' => 'Top Rated Plus',
+        'country' => 'Canada',
+        'memberSince' => 'Nov 2020',
+        'languages' => ['English', 'French'],
+        'completedProjects' => 276,
+        'rating' => 5.0,
+        'ratingCount' => 189,
+        'description' => 'Business consultant with expertise in digital transformation and growth strategies for startups and SMEs.',
+        'skills' => ['Business Strategy', 'Market Research', 'Financial Analysis', 'Project Management', 'Digital Transformation']
+    ]
+];
+
+// Gigs data
+$gigs = [
+    [
+        'id' => 1,
+        'title' => 'Professional Website Development with Modern Technologies',
+        'description' => 'I will create a professional, responsive website using modern technologies like HTML5, CSS3, and JavaScript. The website will be fully optimized for all devices and will follow the latest web standards.',
+        'price' => 299,
+        'rating' => 4.9,
+        'ratingCount' => 128,
+        'image' => 'https://images.unsplash.com/photo-1587440871875-191322ee64b0',
+        'featured' => true,
+        'deliveryTime' => 7,
+        'category' => 'web',
+        'freelancer' => $users[0]
+    ],
+    [
+        'id' => 2,
+        'title' => 'Modern UI/UX Design for Web and Mobile Applications',
+        'description' => 'I will design a modern, user-friendly interface for your web or mobile application. The design will be pixel-perfect and follow the latest design trends and best practices.',
+        'price' => 199,
+        'rating' => 4.9,
+        'ratingCount' => 256,
+        'image' => 'https://images.unsplash.com/photo-1561070791-2526d30994b5',
+        'featured' => false,
+        'deliveryTime' => 5,
+        'category' => 'design',
+        'freelancer' => $users[1]
+    ],
+    [
+        'id' => 3,
+        'title' => 'Complete Digital Marketing Strategy and Implementation',
+        'description' => 'I will create and implement a comprehensive digital marketing strategy for your business, including SEO, social media, and content marketing.',
+        'price' => 399,
+        'rating' => 4.8,
+        'ratingCount' => 93,
+        'image' => 'https://images.unsplash.com/photo-1542744173-05336fcc7ad4',
+        'featured' => true,
+        'deliveryTime' => 14,
+        'category' => 'marketing',
+        'freelancer' => $users[0]
+    ],
+    [
+        'id' => 4,
+        'title' => 'Professional Video Editing and Motion Graphics',
+        'description' => 'I will edit your video with professional transitions, effects, and motion graphics to create a stunning visual experience that captivates your audience.',
+        'price' => 149,
+        'rating' => 4.7,
+        'ratingCount' => 87,
+        'image' => 'https://images.unsplash.com/photo-1536240478700-b869070f9279',
+        'featured' => false,
+        'deliveryTime' => 4,
+        'category' => 'video',
+        'freelancer' => $users[2]
+    ],
+    [
+        'id' => 5,
+        'title' => 'SEO-Optimized Content Writing for Your Website',
+        'description' => 'I will write engaging, SEO-optimized content for your website or blog that ranks well in search engines and converts visitors into customers.',
+        'price' => 89,
+        'rating' => 4.8,
+        'ratingCount' => 152,
+        'image' => 'https://images.unsplash.com/photo-1455390582262-044cdead277a',
+        'featured' => true,
+        'deliveryTime' => 3,
+        'category' => 'writing',
+        'freelancer' => $users[3]
+    ],
+    [
+        'id' => 6,
+        'title' => 'Custom Music Production for Your Project',
+        'description' => 'I will compose and produce original music tailored specifically for your project, whether it\'s a game, video, podcast, or any other media.',
+        'price' => 199,
+        'rating' => 4.9,
+        'ratingCount' => 118,
+        'image' => 'https://images.unsplash.com/photo-1511379938547-c1f69419868d',
+        'featured' => false,
+        'deliveryTime' => 6,
+        'category' => 'music',
+        'freelancer' => $users[4]
+    ],
+    [
+        'id' => 7,
+        'title' => 'Business Growth Strategy and Consultation',
+        'description' => 'I will analyze your business and provide a comprehensive growth strategy with actionable steps to increase revenue and optimize operations.',
+        'price' => 499,
+        'rating' => 5.0,
+        'ratingCount' => 76,
+        'image' => 'https://images.unsplash.com/photo-1460925895917-afdab827c52f',
+        'featured' => true,
+        'deliveryTime' => 10,
+        'category' => 'business',
+        'freelancer' => $users[5]
+    ],
+    [
+        'id' => 8,
+        'title' => 'Mobile App Development for iOS and Android',
+        'description' => 'I will develop a high-quality, native mobile application for both iOS and Android platforms with clean code and excellent user experience.',
+        'price' => 799,
+        'rating' => 4.8,
+        'ratingCount' => 94,
+        'image' => 'https://images.unsplash.com/photo-1551650975-87deedd944c3',
+        'featured' => false,
+        'deliveryTime' => 21,
+        'category' => 'programming',
+        'freelancer' => $users[0]
+    ],
+    [
+        'id' => 9,
+        'title' => 'Logo Design and Brand Identity Package',
+        'description' => 'I will create a professional logo and complete brand identity package including business cards, letterhead, and brand guidelines.',
+        'price' => 349,
+        'rating' => 4.9,
+        'ratingCount' => 187,
+        'image' => 'https://images.unsplash.com/photo-1626785774573-4b799315345d',
+        'featured' => true,
+        'deliveryTime' => 7,
+        'category' => 'design',
+        'freelancer' => $users[1]
+    ],
+    [
+        'id' => 10,
+        'title' => 'Social Media Marketing and Management',
+        'description' => 'I will manage your social media accounts, create engaging content, and implement strategies to grow your following and engagement.',
+        'price' => 249,
+        'rating' => 4.7,
+        'ratingCount' => 112,
+        'image' => 'https://images.unsplash.com/photo-1611162617213-7d7a39e9b1d7',
+        'featured' => false,
+        'deliveryTime' => 30,
+        'category' => 'marketing',
+        'freelancer' => $users[3]
+    ],
+    [
+        'id' => 11,
+        'title' => 'Professional Voice Over for Your Project',
+        'description' => 'I will provide a professional, high-quality voice over for your commercial, explainer video, podcast, or any other audio project.',
+        'price' => 129,
+        'rating' => 4.8,
+        'ratingCount' => 143,
+        'image' => 'https://images.unsplash.com/photo-1590602847861-f357a9332bbc',
+        'featured' => false,
+        'deliveryTime' => 2,
+        'category' => 'music',
+        'freelancer' => $users[4]
+    ],
+    [
+        'id' => 12,
+        'title' => 'E-commerce Website Development with Payment Integration',
+        'description' => 'I will build a complete e-commerce website with product management, shopping cart, and secure payment gateway integration.',
+        'price' => 599,
+        'rating' => 4.9,
+        'ratingCount' => 108,
+        'image' => 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d',
+        'featured' => true,
+        'deliveryTime' => 14,
+        'category' => 'web',
+        'freelancer' => $users[0]
+    ]
+];
+
+// Categories data
+$categories = [
+    ['id' => 'web', 'name' => 'Web Development'],
+    ['id' => 'design', 'name' => 'Design & Creative'],
+    ['id' => 'marketing', 'name' => 'Digital Marketing'],
+    ['id' => 'writing', 'name' => 'Writing & Translation'],
+    ['id' => 'video', 'name' => 'Video & Animation'],
+    ['id' => 'music', 'name' => 'Music & Audio'],
+    ['id' => 'programming', 'name' => 'Programming & Tech'],
+    ['id' => 'business', 'name' => 'Business']
+];
+?>
