@@ -32,11 +32,13 @@ require_once __DIR__ . '/../../config/database.php';
 require_once __DIR__ . '/controllers/DashboardController.php';
 require_once __DIR__ . '/controllers/UserController.php';
 require_once __DIR__ . '/controllers/SupportController.php';
+require_once __DIR__ . '/controllers/ProjectController.php';
 
 // Initialize controllers
 $dashboardController = new DashboardController();
 $userController = new UserController();
 $supportController = new SupportController();
+$projectController = new ProjectController();
 
 // Handle page routing
 $page = isset($_GET['page']) ? $_GET['page'] : 'dashboard';
@@ -58,6 +60,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         else if ($_POST['action'] === 'delete_ticket') {
             // Handle ticket deletion via AJAX
             $supportController->ajaxDeleteTicket();
+            exit; // Stop execution after AJAX response
+        }
+    }
+    
+    // Handle AJAX requests for projects
+    if ($page === 'projects') {
+        if ($_POST['action'] === 'update_status') {
+            // Handle project status update via AJAX
+            $projectController->updateProjectStatus();
+            exit; // Stop execution after AJAX response
+        }
+        else if ($_POST['action'] === 'delete_project') {
+            // Handle project deletion via AJAX
+            $projectController->ajaxDeleteProject();
             exit; // Stop execution after AJAX response
         }
     }
@@ -100,6 +116,9 @@ switch ($page) {
         break;
     case 'settings':
         $userController->settings();
+        break;
+    case 'projects':
+        $projectController->userProjects();
         break;
     case 'support-tickets':
         $action = isset($_GET['action']) ? $_GET['action'] : 'list';

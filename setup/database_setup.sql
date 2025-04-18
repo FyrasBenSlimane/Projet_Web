@@ -132,3 +132,42 @@ CREATE TABLE IF NOT EXISTS support_replies (
 CREATE INDEX support_tickets_user_email_idx ON support_tickets(user_email);
 CREATE INDEX support_tickets_status_idx ON support_tickets(status);
 CREATE INDEX support_replies_ticket_id_idx ON support_replies(ticket_id);
+
+
+CREATE TABLE IF NOT EXISTS projects (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    description TEXT NOT NULL,
+    user_email VARCHAR(255) NOT NULL,
+    client_name VARCHAR(255),
+    budget DECIMAL(10, 2),
+    status ENUM('pending', 'in-progress', 'completed', 'cancelled') DEFAULT 'pending',
+    priority ENUM('low', 'medium', 'high') DEFAULT 'medium',
+    start_date DATE,
+    end_date DATE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS project_files (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    project_id INT NOT NULL,
+    file_name VARCHAR(255) NOT NULL,
+    file_path VARCHAR(255) NOT NULL,
+    uploaded_by VARCHAR(255) NOT NULL,
+    uploaded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS project_tasks (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    project_id INT NOT NULL,
+    title VARCHAR(255) NOT NULL,
+    description TEXT,
+    status ENUM('pending', 'in-progress', 'completed') DEFAULT 'pending',
+    assigned_to VARCHAR(255),
+    due_date DATE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE
+);
