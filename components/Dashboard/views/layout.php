@@ -745,19 +745,19 @@
                     </li>
                     <?php if ($userType === 'freelancer'): ?>
                     <li class="sidebar-menu-item">
-                        <a href="#" class="sidebar-menu-link">
+                        <a href="?page=projects" class="sidebar-menu-link">
                             <i class="bi bi-briefcase-fill sidebar-menu-icon"></i>
                             Projects
                         </a>
                     </li>
                     <li class="sidebar-menu-item">
-                        <a href="#" class="sidebar-menu-link">
+                        <a href="?page=job-offers" class="sidebar-menu-link <?php echo ($page === 'job-offers') ? 'active' : ''; ?>">
                             <i class="bi bi-person-workspace sidebar-menu-icon"></i>
                             Job Offers
                         </a>
                     </li>
                     <li class="sidebar-menu-item">
-                        <a href="#" class="sidebar-menu-link">
+                        <a href="?page=messages" class="sidebar-menu-link">
                             <i class="bi bi-chat-dots-fill sidebar-menu-icon"></i>
                             Messages
                         </a>

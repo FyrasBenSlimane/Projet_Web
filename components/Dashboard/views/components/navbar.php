@@ -42,7 +42,7 @@ if ($profileData && !empty($profileData['profile_image'])) {
                     case 'my-projects':
                         $pageTitle = 'Projects';
                         break;
-                    case 'services':
+                    case 'job-offers':
                         $pageTitle = 'Job Offers';
                         break;
                     case 'messages':
@@ -54,6 +54,8 @@ if ($profileData && !empty($profileData['profile_image'])) {
                     case 'find-talent':
                         $pageTitle = 'Find Talent';
                         break;
+                    default:
+                        $pageTitle = 'Dashboard';
                 }
             }
             echo $pageTitle;

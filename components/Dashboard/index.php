@@ -64,6 +64,9 @@ switch ($page) {
     case 'dashboard':
         $dashboardController->index();
         break;
+    case 'job-offers':
+        include_once __DIR__ . '/../home/offers/offers.php';
+        break;
     case 'profile':
         $userController->profile();
         break;

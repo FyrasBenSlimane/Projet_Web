@@ -1,5 +1,8 @@
 <?php
-require_once __DIR__ . '/../../../config/database.php';
+require_once __DIR__ . '/../../../components/Dashboard/controllers/JobOffersController.php';
+
+// Initialize controller
+$jobOffersController = new JobOffersController();
 
 // Initialize message variable
 $message = '';
@@ -9,67 +12,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['action'])) {
         switch ($_POST['action']) {
             case 'create':
-                $title = $_POST['title'];
-                $description = $_POST['description'];
-                $category = $_POST['category'];
-                $salary_min = $_POST['salary_min'];
-                $salary_max = $_POST['salary_max'];
-                $location = $_POST['location'];
-                $image_url = $_POST['image_url'];
-                
-                $sql = "INSERT INTO job_offers (title, description, category_id, salary_min, salary_max, location_id, image_url) 
-                        VALUES (?, ?, ?, ?, ?, ?, ?)";
-                $stmt = $pdo->prepare($sql);
-                $stmt->execute([$title, $description, $category, $salary_min, $salary_max, $location, $image_url]);
-                $message = "Job offer created successfully!";
+                if ($jobOffersController->createJob($_POST)) {
+                    $message = "Job offer created successfully!";
+                }
                 break;
 
             case 'update':
-                $id = $_POST['job_id'];
-                $title = $_POST['title'];
-                $description = $_POST['description'];
-                $category = $_POST['category'];
-                $salary_min = $_POST['salary_min'];
-                $salary_max = $_POST['salary_max'];
-                $location = $_POST['location'];
-                $image_url = $_POST['image_url'];
-                
-                $sql = "UPDATE job_offers SET title=?, description=?, category_id=?, salary_min=?, salary_max=?, location_id=?, image_url=? WHERE job_id=?";
-                $stmt = $pdo->prepare($sql);
-                $stmt->execute([$title, $description, $category, $salary_min, $salary_max, $location, $image_url, $id]);
-                $message = "Job offer updated successfully!";
+                if ($jobOffersController->updateJob($_POST)) {
+                    $message = "Job offer updated successfully!";
+                }
                 break;
 
             case 'delete':
-                $id = $_POST['job_id'];
-                $sql = "DELETE FROM job_offers WHERE job_id = ?";
-                $stmt = $pdo->prepare($sql);
-                $stmt->execute([$id]);
-                $message = "Job offer deleted successfully!";
+                if ($jobOffersController->deleteJob($_POST['job_id'])) {
+                    $message = "Job offer deleted successfully!";
+                }
                 break;
         }
     }
 }
 
-// Fetch all job offers
-$sql = "SELECT jo.*, jc.name as category_name, l.city, l.country, l.is_remote,
-        (SELECT COUNT(*) FROM job_applications WHERE job_id = jo.job_id) as applicant_count
-        FROM job_offers jo
-        LEFT JOIN job_categories jc ON jo.category_id = jc.category_id
-        LEFT JOIN locations l ON jo.location_id = l.location_id
-        ORDER BY jo.created_at DESC";
-$stmt = $pdo->query($sql);
-$jobs = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-// Fetch categories for dropdown
-$sql = "SELECT * FROM job_categories";
-$stmt = $pdo->query($sql);
-$categories = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-// Fetch locations for dropdown
-$sql = "SELECT * FROM locations";
-$stmt = $pdo->query($sql);
-$locations = $stmt->fetchAll(PDO::FETCH_ASSOC);
+// Fetch data using controller
+$jobs = $jobOffersController->getAllJobs();
+$categories = $jobOffersController->getCategories();
+$locations = $jobOffersController->getLocations();
 ?>
 
 <!DOCTYPE html>

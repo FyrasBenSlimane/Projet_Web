@@ -40,7 +40,7 @@ $initialTheme = $savedTheme ?: ($systemTheme ?: 'light');
                 </a>
             </li>
             <li class="sidebar-menu-item">
-                <a href="?page=services" class="sidebar-menu-link <?php echo (isset($_GET['page']) && $_GET['page'] === 'services') ? 'active' : ''; ?>">
+                <a href="?page=job-offers" class="sidebar-menu-link <?php echo (isset($_GET['page']) && $_GET['page'] === 'job-offers') ? 'active' : ''; ?>">
                     <i class="bi bi-person-workspace sidebar-menu-icon"></i>
                     Job Offers
                 </a>
